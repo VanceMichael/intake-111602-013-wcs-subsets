@@ -17,9 +17,11 @@ npm run demo
 
 需要交互时分别运行 `npm run source` 与 `npm start`。来源默认监听本机 4310 端口，应用默认监听 4320；可用 `PORT`、`SOURCE_URL`、`DATA_DIR` 配置。`GET /preview` 获取预览，`POST /receipts` 接收当前资料，`GET /receipts` 查询凭据，`GET /objects/<摘要>` 回读原件。应用只允许配置到本机的资料服务。
 
+按范围领取温度覆盖：`POST /subsets`，请求体如 `{"coverageId":"park-temp","trims":{"Lat":[30.2,30.3],"Long":[120,121.6]}}`。服务先读取来源公布的轴、方向、单位、网格、nil 值、格式与单次网格上限，再把需求对齐到网格点并分块领取；每块独立核对版本、原点、步长、形状、物理范围和无数据标记，重叠网格点去重，描述更新导致的版本变化会中止并拒绝新旧网格拼接。凭据 `GET /subsets`、`GET /subsets/<id>` 回读，其中说明多取范围、出界未取得部分、时间轴限制和每块来源原件摘要；不做插值或地图展示。契约细节见 `docs/资料接口.md`。
+
 ## 目录
 
-`source/` 负责资料源的发布日期和传输状态；`src/decode.mjs` 解释一份来源资料；`src/catalog.mjs` 管理不可变原件及接收凭据；`src/app.mjs` 提供查看服务。资料含义及来源控制见 `docs/资料接口.md`。
+`source/` 负责资料源的发布日期和传输状态；`src/decode.mjs` 解释一份来源资料；`src/catalog.mjs` 管理不可变原件及接收凭据；`src/subset.mjs` 负责按范围领取的轴/网格理解、分块规划、逐块核对与去重合并；`src/app.mjs` 提供查看服务。资料含义及来源控制见 `docs/资料接口.md`。
 
 ## 容器
 
